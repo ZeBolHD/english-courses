@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-strapi
+    env_file: .env
+    ports:
+      - 5442:5432
+    volumes:
+      - english-courses-db:/var/lib/postgresql/data
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+    restart: always
+    ports:
+      - 1337:1337
+    env_file: .env
+    volumes:
+      - ./apps/backend/public/uploads:/app/apps/backend/public/uploads
+    depends_on:
+      - postgres
+
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    env_file: .env
+    depends_on:
+      - backend
+
+volumes:
+  english-courses-db:
+    external: true
